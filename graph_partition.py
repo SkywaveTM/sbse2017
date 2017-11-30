@@ -318,18 +318,58 @@ def MQ(cluster0, graph):
     return mq
 
 
+def clustering_bottom_up(graph):
+    num_of_module = len(graph[0])
+    cluster = [i for i in range(num_of_module)]
+
+    mq = MQ(cluster, graph)
+    r=1
+    while True:
+        print(r, " round", mq, cluster)
+        r+=1
+        next_MQ = 0
+        unique_cluster = list(set(cluster))
+        next_cluster = cluster.copy()
+
+        #choose two cluster and merge
+        for i in range(len(unique_cluster)):
+            for j in range(i+1, len(unique_cluster)):
+                temp = cluster.copy()
+                for c in range(len(temp)):
+                    if temp[c] == unique_cluster[j]:
+                        temp[c] = unique_cluster[i]
+                cur_MQ = MQ(temp, graph)
+                if next_MQ < cur_MQ:
+                    next_MQ = cur_MQ
+                    next_cluster = temp.copy()
+        if next_MQ > mq:
+            cluster = normalize(next_cluster.copy())
+            mq = next_MQ
+        else:
+            break
+
+    return cluster
+
+
 def main():
 
-    file_name = "input_gen3.csv"
+    file_name = "data/undirect3.csv"
     graph = csv_to_list(file_name)
     #print_graph(graph)
     #print()
 
+    print("random...")
     cluster_result1 = clustering_random(graph)
-    cluster_result2 = clustering_Kernighan_Lin_nver(graph)
+    print("Kernighan Lin nver...")
+    cluster_result2 = clustering_Kernighan_Lin_nver(graph)  #needs long time...
+    print("Spectral Bisection nver...")
     cluster_result3 = clustering_Spectral_Bisection_nver(graph)
+    print("Kernighan Lin...")
     cluster_result4 = clustering_Kernighan_Lin(graph)
+    print("Spectral Bisection...")
     cluster_result5 = clustering_Spectral_Bisection(graph)
+    print("Bottom Up...")
+    cluster_result6 = clustering_bottom_up(graph)
 
     print("random")
     print_cluster_result_list(cluster_result1)
@@ -356,6 +396,12 @@ def main():
     print_cluster_result_list(cluster_result3)
     print(MQ(cluster_result3, graph))
     print()
+
+    print("Bottom Up")
+    print_cluster_result_list(cluster_result6)
+    print(MQ(cluster_result6, graph))
+    print()
+
     return
 
 
