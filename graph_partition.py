@@ -16,6 +16,7 @@ def csv_to_list(file_name):
         for i in range(len(list_line)):
             cur_line.append(int(list_line[i]))
         graph_list.append(cur_line)
+    f.close()
     return graph_list
 
 
