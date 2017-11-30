@@ -323,7 +323,7 @@ def clustering_bottom_up(graph):
     cluster = [i for i in range(num_of_module)]
 
     mq = MQ(cluster, graph)
-    r=1
+    r = 1
     while True:
         #print(r, " round", mq, cluster)
         r+=1
