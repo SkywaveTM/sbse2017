@@ -325,7 +325,7 @@ def clustering_bottom_up(graph):
     mq = MQ(cluster, graph)
     r=1
     while True:
-        print(r, " round", mq, cluster)
+        #print(r, " round", mq, cluster)
         r+=1
         next_MQ = 0
         unique_cluster = list(set(cluster))
@@ -371,6 +371,7 @@ def main():
     print("Bottom Up...")
     cluster_result6 = clustering_bottom_up(graph)
 
+    print()
     print("random")
     print_cluster_result_list(cluster_result1)
     print(MQ(cluster_result1, graph))
