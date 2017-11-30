@@ -1,9 +1,16 @@
+"""
+writer: Yongjun Shin
+date: 2017.11.30
+USAGE: change directory path of inputs
+"""
+
 import os
 import time
 from graph_partition import *
 
 def main():
-    dirName = "./small_test_data/"
+    dirName = "./small_test_data/"  #terminate path with one slash
+
     if not os.path.isdir(dirName+"results"):
         os.mkdir(dirName+"results")
     f_r = open(dirName + "results/result_random.csv", 'w')
