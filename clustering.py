@@ -305,8 +305,8 @@ class GeneticAlgorithm:
         gen_count = 0
 
         while gen_count <= max_gen:
-            crossed = [self._cross(*random.sample(generation, k=2)) for _ in range(max_pop)]
-            mutated = list(filter(None, [self._mutate(random.choice(generation)) for _ in range(max_pop)]))
+            crossed = itertools.chain(*[self._cross(*random.sample(generation, k=2)) for _ in range(max_pop)])
+            mutated = filter(None, [self._mutate(random.choice(generation)) for _ in range(max_pop)])
             merged = filter(lambda x: len(x.blocks) <= max_blocks, itertools.chain(generation, crossed, mutated))
 
             evals = [(model, model.generate_cluster(graph)) for model in merged]
@@ -319,11 +319,14 @@ class GeneticAlgorithm:
 
         return generation
 
-    def _cross(self, a: Model, b: Model) -> Optional[Model]:
-        new_blocks = b.blocks
-        new_blocks.insert(random.randrange(len(new_blocks)), random.choice(a.blocks))
+    def _cross(self, a: Model, b: Model) -> List[Model]:
+        a_index = random.randrange(len(a.blocks)) + 1
+        b_index = random.randrange(len(b.blocks)) + 1
 
-        return self._model_gen.generate_model(new_blocks)
+        new_blocks = (a.blocks[a_index:] + b.blocks[:b_index],
+                      b.blocks[b_index:] + a.blocks[:a_index])
+
+        return [self._model_gen.generate_model(new_block) for new_block in new_blocks]
 
     def _mutate(self, a: Model, mutate_type: Optional[MutateEnum]=None) -> Optional[Model]:
         if mutate_type is None:
