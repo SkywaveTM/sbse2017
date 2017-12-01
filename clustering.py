@@ -1,8 +1,11 @@
 import itertools
+import pickle
 import random
 from enum import Enum, auto
 from pathlib import Path
 from typing import List, Optional
+
+import datetime
 
 
 class SelectionEnum(Enum):
@@ -351,11 +354,26 @@ class GeneticAlgorithm:
 
 
 if __name__ == '__main__':
-    graph = Graph(Path('data/input_gen1.csv'))
+    data_root = Path('data/')
+    data_file_name = 'input_gen1.csv'
+    data_path = data_root / data_file_name
+
+    out_root = Path('out/')
+    timestamp = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
+    out_path = out_root / '{}_{}.pickle'.format(data_file_name, timestamp)
+
+    out_root.mkdir(exist_ok=True)
+
+    graph = Graph(data_path)
     mg = ModelGenerator(500)
     ga = GeneticAlgorithm(mg)
 
-    models = ga.run(graph, max_pop=10, max_gen=20, max_blocks=10)
-    print('results')
+    models = ga.run(graph, max_pop=5, max_gen=5, max_blocks=5)
+
+    # with out_path.open('rb') as f:
+    #   models = pickle.load(f)
+
+    with out_path.open('wb') as f:
+        pickle.dump(models, f)
 
     print(max((model.generate_cluster(graph).mq for model in models)))
