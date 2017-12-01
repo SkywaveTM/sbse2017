@@ -247,20 +247,23 @@ class ModelBlock:
 
 
 class Model:
-    def __init__(self, blocks: List[ModelBlock]):
+    def __init__(self, blocks: List[ModelBlock], max_iter=200, max_skip=5, no_skip=False):
+        self._no_skip = no_skip
+        self._max_skip = max_skip
+        self._max_iter = max_iter
         self._blocks = blocks
 
     @property
     def blocks(self):
         return self._blocks[:]
 
-    def generate_cluster(self, graph: Graph, max_iter=200, max_skip=5, no_skip=False) -> Clustering:
+    def generate_cluster(self, graph: Graph) -> Clustering:
         cluster = Clustering(graph)
 
         skipped = 0
         iter = 0
 
-        while iter < max_iter:
+        while iter < self._max_iter:
             new_cluster = Clustering(cluster.graph, cluster.cluster_repr)
 
             # print(new_cluster.cluster_repr)
@@ -269,24 +272,35 @@ class Model:
                 iter += 1
                 block.apply(new_cluster)
 
-            if no_skip or new_cluster.mq > cluster.mq:
+            if self._no_skip or new_cluster.mq > cluster.mq:
                 cluster = new_cluster
                 skipped = 0
             else:
                 skipped += 1
 
-                if skipped > max_skip:
+                if skipped > self._max_skip:
                     break
 
         return cluster
 
 
+class ModelGenerator:
+    def __init__(self, max_iter=200, max_skip=5, no_skip=True):
+        self._max_iter = max_iter
+        self._max_skip = max_skip
+        self._no_skip = no_skip
+
+    def generate_model(self, blocks: List[ModelBlock]) -> Model:
+        return Model(blocks, self._max_iter, self._max_skip, self._no_skip)
+
+
 class GeneticAlgorithm:
-    def __init__(self):
+    def __init__(self, model_gen: ModelGenerator):
+        self._model_gen = model_gen
         pass
 
     def run(self, graph: Graph, max_pop=20, max_gen=30, max_blocks=5) -> List[Model]:
-        generation = [Model([ModelBlock()]) for _ in range(max_pop)]
+        generation = [self._model_gen.generate_model([ModelBlock()]) for _ in range(max_pop)]
 
         gen_count = 0
 
@@ -309,7 +323,7 @@ class GeneticAlgorithm:
         new_blocks = b.blocks
         new_blocks.insert(random.randrange(len(new_blocks)), random.choice(a.blocks))
 
-        return Model(new_blocks)
+        return self._model_gen.generate_model(new_blocks)
 
     def _mutate(self, a: Model, mutate_type: Optional[MutateEnum]=None) -> Optional[Model]:
         if mutate_type is None:
@@ -330,14 +344,14 @@ class GeneticAlgorithm:
 
             new_blocks.remove(new_blocks[random.randrange(len(new_blocks))])
 
-        return Model(new_blocks)
+        return self._model_gen.generate_model(new_blocks)
 
 
 if __name__ == '__main__':
-    graph = Graph(Path('data/input_gen3.csv'))
+    graph = Graph(Path('data/input_gen1.csv'))
     ga = GeneticAlgorithm()
 
-    models = ga.run(graph, max_pop=20, max_gen=30, max_blocks=5)
+    models = ga.run(graph, max_pop=10, max_gen=20, max_blocks=10)
     print('results')
 
     print(max((model.generate_cluster(graph).mq for model in models)))
