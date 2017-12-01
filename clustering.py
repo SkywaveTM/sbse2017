@@ -285,7 +285,7 @@ class Model:
 
 
 class ModelGenerator:
-    def __init__(self, max_iter=200, max_skip=5, no_skip=True):
+    def __init__(self, max_iter=200, max_skip=5, no_skip=False):
         self._max_iter = max_iter
         self._max_skip = max_skip
         self._no_skip = no_skip
@@ -352,7 +352,8 @@ class GeneticAlgorithm:
 
 if __name__ == '__main__':
     graph = Graph(Path('data/input_gen1.csv'))
-    ga = GeneticAlgorithm()
+    mg = ModelGenerator(500)
+    ga = GeneticAlgorithm(mg)
 
     models = ga.run(graph, max_pop=10, max_gen=20, max_blocks=10)
     print('results')
