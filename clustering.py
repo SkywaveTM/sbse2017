@@ -5,7 +5,7 @@ from enum import Enum, auto
 from pathlib import Path
 from typing import List, Optional
 
-import datetime
+import datetime, time
 
 
 class SelectionEnum(Enum):
@@ -382,15 +382,22 @@ if __name__ == '__main__':
     out_root = Path('ga_out/')
     out_root.mkdir(exist_ok=True)
 
+    report_path = out_root / 'report.csv'
+    report_contents = []
+
     for csv_path in data_root.glob("*.csv"):
-        timestamp = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
-        out_path = out_root / '{}_{}.pickle'.format(csv_path.name, timestamp)
+        start_time = time.time()
+
+        out_path = out_root / '{}.pickle'.format(csv_path.name)
 
         graph = Graph(csv_path)
         mg = ModelGenerator(max_iter=-1, max_skip=max(10, graph.size))
         ga = GeneticAlgorithm(mg)
 
         models = ga.run(graph, max_pop=50, max_gen=30, max_blocks=-1)
+
+        elapsed_time = time.time() - start_time
+        report_contents.append([csv_path.name, str(elapsed_time)])
 
         # with out_path.open('rb') as f:
         #   models = pickle.load(f)
@@ -399,3 +406,7 @@ if __name__ == '__main__':
             pickle.dump(models, f)
 
         print(max((model.generate_cluster(graph).mq for model in models)))
+
+    with report_path.open('w') as f:
+        f.write('graph, elapsed\n')
+        f.writelines(('{}, {}\n'.format(*x) for x in report_contents))
