@@ -139,10 +139,26 @@ class Clustering:
         self.cluster_repr = new_repr
 
     def merge_module(self, from_module: int, to_module: int):
-        pass
+        new_repr = self.cluster_repr
+
+        to_cluster = new_repr[to_module]
+        from_modules = self.get_modules(new_repr[from_module])
+
+        for module in from_modules:
+            new_repr[module] = to_cluster
+
+        self.cluster_repr = new_repr
 
     def tear_module(self, target_module: int):
-        pass
+        new_repr = self.cluster_repr
+
+        modules = self.get_modules(new_repr[target_module])
+        empty_clusters = set(range(self.graph.size * 2)) - set(new_repr)
+
+        for module, empty_cluster in zip(modules, empty_clusters):
+            new_repr[module] = empty_cluster
+
+        self.cluster_repr = new_repr
 
     def get_cluster_stat(self, cluster_id: int):
         return self._cluster_stats[cluster_id]
