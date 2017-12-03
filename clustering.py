@@ -319,15 +319,16 @@ class GeneticAlgorithm:
         self._model_gen = model_gen
         pass
 
-    def run(self, graph: Graph, max_pop=20, max_gen=30, max_blocks=5) -> List[Model]:
+    def run(self, graph: Graph, max_pop=20, max_gen=30, max_blocks=-1) -> List[Model]:
         generation = [self._model_gen.generate_model([ModelBlock()]) for _ in range(max_pop)]
+        merge_filter = lambda x: len(x.blocks) <= max_blocks if max_blocks >= 0 else lambda x: True
 
         gen_count = 0
 
         while gen_count <= max_gen:
             crossed = itertools.chain(*[self._cross(*random.sample(generation, k=2)) for _ in range(max_pop)])
             mutated = filter(None, [self._mutate(random.choice(generation)) for _ in range(max_pop)])
-            merged = filter(lambda x: len(x.blocks) <= max_blocks, itertools.chain(generation, crossed, mutated))
+            merged = filter(merge_filter, itertools.chain(generation, crossed, mutated))
 
             evals = [(model, model.generate_cluster(graph)) for model in merged]
             evals = sorted(evals, key=lambda x: x[1].mq, reverse=True)
@@ -380,10 +381,10 @@ if __name__ == '__main__':
         out_path = out_root / '{}_{}.pickle'.format(csv_path.name, timestamp)
 
         graph = Graph(csv_path)
-        mg = ModelGenerator(max_iter=-1, max_skip=5)
+        mg = ModelGenerator(max_iter=-1, max_skip=max(10, graph.size))
         ga = GeneticAlgorithm(mg)
 
-        models = ga.run(graph, max_pop=20, max_gen=20, max_blocks=10)
+        models = ga.run(graph, max_pop=50, max_gen=30, max_blocks=-1)
 
         # with out_path.open('rb') as f:
         #   models = pickle.load(f)
