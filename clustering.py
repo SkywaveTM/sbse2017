@@ -49,6 +49,7 @@ class Graph:
         self.graph = None
 
         with graph_path.open() as f:
+            f.readline()
             self.graph = tuple([int(num) for num in line.split(',')] for line in f.readlines())
 
     @property
@@ -371,25 +372,23 @@ class GeneticAlgorithm:
 
 if __name__ == '__main__':
     data_root = Path('data/')
-    data_file_name = 'input_gen1.csv'
-    data_path = data_root / data_file_name
-
-    out_root = Path('out/')
-    timestamp = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
-    out_path = out_root / '{}_{}.pickle'.format(data_file_name, timestamp)
-
+    out_root = Path('ga_out/')
     out_root.mkdir(exist_ok=True)
 
-    graph = Graph(data_path)
-    mg = ModelGenerator(500)
-    ga = GeneticAlgorithm(mg)
+    for csv_path in data_root.glob("*.csv"):
+        timestamp = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
+        out_path = out_root / '{}_{}.pickle'.format(csv_path.name, timestamp)
 
-    models = ga.run(graph, max_pop=5, max_gen=5, max_blocks=5)
+        graph = Graph(csv_path)
+        mg = ModelGenerator(1000, 10)
+        ga = GeneticAlgorithm(mg)
 
-    # with out_path.open('rb') as f:
-    #   models = pickle.load(f)
+        models = ga.run(graph, max_pop=20, max_gen=20, max_blocks=10)
 
-    with out_path.open('wb') as f:
-        pickle.dump(models, f)
+        # with out_path.open('rb') as f:
+        #   models = pickle.load(f)
 
-    print(max((model.generate_cluster(graph).mq for model in models)))
+        with out_path.open('wb') as f:
+            pickle.dump(models, f)
+
+        print(max((model.generate_cluster(graph).mq for model in models)))
