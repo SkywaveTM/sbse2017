@@ -17,17 +17,15 @@ class SelectionEnum(Enum):
 
 
 class ConditionEnum(Enum):
-    MQ_G_GT_C = auto()
-    MQ_G_LT_C = auto()
     COUPLING_A_GT_B = auto()
     COUPLING_A_LT_B = auto()
     COHESION_A_GT_B = auto()
     COHESION_A_LT_B = auto()
     SIZE_A_GT_B = auto()
     SIZE_A_LT_B = auto()
-    ALWAYS_TRUE = auto()
-    # MF_A_GT_B
-    # RANDOMLY_C
+    MF_A_GT_B = auto()
+    MF_A_LT_B = auto()
+    RANDOMLY_LT_C = auto()
 
 
 class ActionEnum(Enum):
@@ -198,8 +196,6 @@ class Clustering:
 
 class ModelBlock:
     CONDITION_LAMBDA = {
-        ConditionEnum.MQ_G_GT_C: lambda cl, a, b, c: cl.mq > c,
-        ConditionEnum.MQ_G_LT_C: lambda cl, a, b, c: cl.mq < c,
         ConditionEnum.COUPLING_A_GT_B: lambda cl, a, b, c: cl.get_cluster_stat(a).coupling > cl.get_cluster_stat(
             b).coupling,
         ConditionEnum.COUPLING_A_LT_B: lambda cl, a, b, c: cl.get_cluster_stat(a).coupling < cl.get_cluster_stat(
@@ -210,7 +206,9 @@ class ModelBlock:
             b).cohesion,
         ConditionEnum.SIZE_A_GT_B: lambda cl, a, b, c: cl.get_cluster_stat(a).size > cl.get_cluster_stat(b).size,
         ConditionEnum.SIZE_A_LT_B: lambda cl, a, b, c: cl.get_cluster_stat(a).size < cl.get_cluster_stat(b).size,
-        ConditionEnum.ALWAYS_TRUE: lambda cl, a, b, c: True
+        ConditionEnum.MF_A_GT_B: lambda cl, a, b, c: cl.get_cluster_stat(a).mf > cl.get_cluster_stat(b).mf,
+        ConditionEnum.MF_A_LT_B: lambda cl, a, b, c: cl.get_cluster_stat(a).mf < cl.get_cluster_stat(b).mf,
+        ConditionEnum.RANDOMLY_LT_C: lambda cl, a, b, c: random.random() < c
     }
 
     ACTION_LAMBDA = {
