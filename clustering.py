@@ -228,10 +228,12 @@ class ModelBlock:
                  cond_const: Optional[float]=None,
                  action: Optional[ActionEnum]=None):
 
+        a_random, b_random = random.sample(list(SelectionEnum.__members__.values()), k=2)
+
         if a_selection is None:
-            a_selection = random.choice(list(SelectionEnum.__members__.values()))
+            a_selection = a_random
         if b_selection is None:
-            b_selection = random.choice(list(SelectionEnum.__members__.values()))
+            b_selection = b_random
         if cond is None:
             cond = random.choice(list(ConditionEnum.__members__.values()))
         if cond_const is None:
