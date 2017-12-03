@@ -283,15 +283,15 @@ class Model:
         cluster = Clustering(graph)
 
         skipped = 0
-        iter = 0
+        iter_count = 0
 
-        while iter < self._max_iter:
+        while self._max_iter < 0 or iter_count < self._max_iter:
             new_cluster = Clustering(cluster.graph, cluster.cluster_repr)
 
             # print(new_cluster.cluster_repr)
 
             for block in self._blocks:
-                iter += 1
+                iter_count += 1
                 block.apply(new_cluster)
 
             if self._no_skip or new_cluster.mq > cluster.mq:
@@ -307,7 +307,7 @@ class Model:
 
 
 class ModelGenerator:
-    def __init__(self, max_iter=200, max_skip=5, no_skip=False):
+    def __init__(self, max_iter=-1, max_skip=5, no_skip=False):
         self._max_iter = max_iter
         self._max_skip = max_skip
         self._no_skip = no_skip
@@ -382,7 +382,7 @@ if __name__ == '__main__':
         out_path = out_root / '{}_{}.pickle'.format(csv_path.name, timestamp)
 
         graph = Graph(csv_path)
-        mg = ModelGenerator(1000, 10)
+        mg = ModelGenerator(max_iter=-1, max_skip=5)
         ga = GeneticAlgorithm(mg)
 
         models = ga.run(graph, max_pop=20, max_gen=20, max_blocks=10)
