@@ -13,6 +13,8 @@ class SelectionEnum(Enum):
     COUPLING_LO = auto()
     COHESION_HI = auto()
     COHESION_LO = auto()
+    MF_HI = auto()
+    MF_LO = auto()
     RANDOM = auto()
 
 
@@ -124,6 +126,10 @@ class Clustering:
             return sorted(self._cluster_stats.items(), key=lambda x: x[1].cohesion, reverse=True)[0][0]
         elif selection_method is SelectionEnum.COHESION_LO:
             return sorted(self._cluster_stats.items(), key=lambda x: x[1].cohesion)[0][0]
+        elif selection_method is SelectionEnum.MF_HI:
+            return sorted(self._cluster_stats.items(), key=lambda x: x[1].mf, reverse=True)[0][0]
+        elif selection_method is SelectionEnum.MF_LO:
+            return sorted(self._cluster_stats.items(), key=lambda x: x[1].mf)[0][0]
 
     def get_modules(self, cluster: int) -> List[int]:
         candidates = list(filter(lambda x: x[1] == cluster, enumerate(self._cluster_repr)))
