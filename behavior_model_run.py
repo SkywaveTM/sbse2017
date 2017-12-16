@@ -1,7 +1,3 @@
-from pathlib import Path
-
-import pickle
-
 import re
 
 from clustering import *

@@ -10,6 +10,7 @@ import numpy.linalg as lin
 def csv_to_list(file_name):
     f = open(file_name, 'r')
     graph_list = []
+    f.readline()
     for line in f.readlines():
         list_line = line.strip().split(',')
         cur_line = []

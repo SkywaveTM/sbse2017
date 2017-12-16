@@ -1,11 +1,10 @@
 import itertools
 import pickle
 import random
+import time
 from enum import Enum, auto
 from pathlib import Path
 from typing import List, Optional
-
-import datetime, time
 
 
 class SelectionEnum(Enum):
@@ -89,7 +88,7 @@ class Clustering:
 
     @cluster_repr.setter
     def cluster_repr(self, value: List[int]):
-        if graph.size != len(value):
+        if self._graph.size != len(value):
             raise ValueError
 
         self._cluster_repr = value
@@ -386,6 +385,7 @@ if __name__ == '__main__':
     report_contents = []
 
     for csv_path in data_root.glob("*.csv"):
+        print(csv_path)
         start_time = time.time()
 
         out_path = out_root / '{}.pickle'.format(csv_path.name)

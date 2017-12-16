@@ -9,23 +9,24 @@ import time
 from graph_partition import *
 
 def main():
-    dirName = "./small_test_data/"  #terminate path with one slash
+    data_dir = "./data/"  #terminate path with one slash
+    out_dir = "./heuristic_out/"
 
-    if not os.path.isdir(dirName+"results"):
-        os.mkdir(dirName+"results")
-    f_r = open(dirName + "results/result_random.csv", 'w')
-    f_K = open(dirName + "results/result_Kerninghan.csv", 'w')
-    f_S = open(dirName + "results/result_Spectral.csv", 'w')
-    f_B = open(dirName + "results/result_buttom_up.csv", 'w')
+    if not os.path.isdir(out_dir):
+        os.mkdir(out_dir)
+    f_r = open(out_dir + "result_random.csv", 'w')
+    f_K = open(out_dir + "result_Kerninghan.csv", 'w')
+    f_S = open(out_dir + "result_Spectral.csv", 'w')
+    f_B = open(out_dir + "result_buttom_up.csv", 'w')
     f_r.write(",MQ, time(s), cluster\n")
     f_K.write(",MQ, time(s), cluster\n")
     f_S.write(",MQ, time(s), cluster\n")
     f_B.write(",MQ, time(s), cluster\n")
 
-    for fname in os.listdir(dirName):
-        if not os.path.isfile(dirName+fname):
+    for fname in os.listdir(data_dir):
+        if not os.path.isfile(data_dir+fname):
             continue
-        graph = csv_to_list(dirName+fname)
+        graph = csv_to_list(data_dir+fname)
         f_r.write(fname + ",")
         f_K.write(fname + ",")
         f_S.write(fname + ",")
